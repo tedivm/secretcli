@@ -2,9 +2,6 @@
 from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open
-from os import path
-
-here = path.abspath(path.dirname(__file__))
 
 try:
     import pypandoc
@@ -13,7 +10,7 @@ except(IOError, ImportError):
     long_description = open('README.md').read()
 
 
-version = '0.1.0'
+version = '0.1.1'
 setup(
 
   name = 'secretcli',
@@ -46,7 +43,8 @@ setup(
     'boto3>=1.9,<2.0',
     'click>=6.0,<8.0',
     'requests',
-    'pyyaml'
+    'pyyaml',
+    'urllib3<1.24'
   ],
 
   extras_require={

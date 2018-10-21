@@ -14,7 +14,7 @@ clean:
 	rm -rf $(ROOT_DIR)/dist;
 	rm -rf $(ROOT_DIR)/env;
 	rm -rf $(ROOT_DIR)/*.egg-info;
-	rm -rf $(ROOT_DIR)/urlparser/*.pyc;
+	rm -rf $(ROOT_DIR)/secretcli/*.pyc;
 
 package:
 	source $(ROOT_DIR)/env/bin/activate; python setup.py bdist_wheel
