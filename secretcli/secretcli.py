@@ -80,7 +80,7 @@ def region():
 
 @cli.command(short_help="Initialize a new secret in the AWS Secrets Manager")
 @click.argument('secret')
-@click.option('-r', '--region', default=None)
+@click.option('-r', '--region', default=None, help='Specify which AWS Region the secret is stored in')
 @click.option('-d', '--description', default='')
 def init(secret, region, description):
     client = get_aws_client(region)
@@ -95,7 +95,7 @@ def init(secret, region, description):
 @click.argument('secret')
 @click.argument('key')
 @click.option('-c', '--category', default=None)
-@click.option('-r', '--region', default=None)
+@click.option('-r', '--region', default=None, help='Specify which AWS Region the secret is stored in')
 def get(secret, key, category, region):
     secret_data = get_secret(secret, region)
     if category:
@@ -112,10 +112,17 @@ def get(secret, key, category, region):
 @cli.command(short_help="Set a specific value in the secret datastore")
 @click.argument('secret')
 @click.argument('key')
-@click.argument('value')
+@click.argument('value', required=False)
+@click.option('-s', '--secure', is_flag=True, default=False, help='Pass value to prompt without displaying it on screen')
 @click.option('-c', '--category', default=None)
-@click.option('-r', '--region', default=None)
-def set(secret, key, value, category, region):
+@click.option('-r', '--region', default=None, help='Specify which AWS Region the secret is stored in')
+def set(secret, key, value, category, secure, region):
+    if not value:
+        if secure:
+            value = click.prompt('Value', hide_input=True, confirmation_prompt=True)
+        else:
+            raise click.UsageError("Value must be provided for set command")
+
     secret_data = get_secret(secret, region)
     if category:
         if category not in secret_data:
@@ -130,7 +137,7 @@ def set(secret, key, value, category, region):
 @click.argument('secret')
 @click.argument('key')
 @click.option('-c', '--category', default=None)
-@click.option('-r', '--region', default=None)
+@click.option('-r', '--region', default=None, help='Specify which AWS Region the secret is stored in')
 def remove(secret, key, category, region):
     secret_data = get_secret(secret, region)
     if category:
@@ -147,7 +154,7 @@ def remove(secret, key, category, region):
 @cli.command(short_help="Set a specific value in the secret datastore")
 @click.argument('secret')
 @click.option('-c', '--category', default=None)
-@click.option('-r', '--region', default=None)
+@click.option('-r', '--region', default=None, help='Specify which AWS Region the secret is stored in')
 def list(secret, category, region):
     secret_data = get_secret(secret, region)
     if category:
@@ -162,7 +169,7 @@ def list(secret, category, region):
 @cli.command(short_help="Upload a replacement secrets file")
 @click.argument('secret')
 @click.argument('input', type=click.File('rb'))
-@click.option('-r', '--region', default=None)
+@click.option('-r', '--region', default=None, help='Specify which AWS Region the secret is stored in')
 def upload(secret, input, region):
     content = input.read().decode("utf-8")
     put_secret(secret, content, region, raw=True)
@@ -171,7 +178,7 @@ def upload(secret, input, region):
 @cli.command(short_help="Download the entire secrets file")
 @click.argument('secret')
 @click.argument('output', type=click.File('wb'), required=False)
-@click.option('-r', '--region', default=None)
+@click.option('-r', '--region', default=None, help='Specify which AWS Region the secret is stored in')
 def download(secret, output, region):
     contents = get_secret(secret, region, raw=True)
     if not output:

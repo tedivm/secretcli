@@ -10,7 +10,7 @@ except(IOError, ImportError):
     long_description = open('README.md').read()
 
 
-version = '0.1.1'
+version = '0.1.2'
 setup(
 
   name = 'secretcli',

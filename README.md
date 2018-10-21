@@ -43,6 +43,17 @@ $ secretscli remove TestSecret postgreshost
 $ secretscli get TestSecret postgreshost
 ```
 
+To avoid passing the value directly into the console (potentially logging it in places like bash history) the `-s` flag can be passed and the value can be passed in interactively without displaying it.
+
+
+```bash
+$ secretscli set TestSecret postgrespassword -s
+Value:
+Repeat for confirmation:
+$ secretscli get TestSecret postgrespassword
+super_secret_string
+```
+
 ### Working with entire Files
 
 The entire Secret can be downloaded as a file. This command works regardless of the format of the file- Secrets that are not managed by `secretcli` can be downloaded using this tool.
@@ -59,4 +70,6 @@ $ secretscli upload TestSecret ./secret_configuration.json
 
 ## Datastore Format
 
-`secretcli` stores data as a json object. It uses the `SecretString` field in the AWS Secrets Manager- saving it as a string allows the database to be viewed in the AWS Console.
+`secretcli` stores data as a JSON Object in an attempt to be as interoperable as possible. Each `key` passed to `secretcli` is represented by a `key` in the JSON Object. 
+
+When storing in AWS Secret Manager `secretcli` uses the `SecretString` field in the AWS Secrets Manager. This allows the database to be viewed in the AWS Console both as a raw string and using the Key/Value table.
