@@ -20,7 +20,7 @@ def get_secret(secret_name, region=None, raw=False):
 
     if raw:
         return secret
-    return yaml.load(secret)
+    return yaml.safe_load(secret)
 
 def put_secret(secret_name, secret_value, region=None, raw=False):
     """Save the supplied value as the secret in the AWS Secrets Manager"""

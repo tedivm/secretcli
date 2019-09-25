@@ -6,7 +6,7 @@ all: dependencies
 fresh: clean dependencies
 
 dependencies:
-	if [ ! -d $(ROOT_DIR)/env ]; then python3.6 -m venv $(ROOT_DIR)/env; fi
+	if [ ! -d $(ROOT_DIR)/env ]; then python3 -m venv $(ROOT_DIR)/env; fi
 	source $(ROOT_DIR)/env/bin/activate; yes w | python -m pip install -e .[dev]
 
 clean:
