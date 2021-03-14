@@ -22,20 +22,25 @@ def get_secret(secret_name, region=None, raw=False):
         return secret
     return yaml.safe_load(secret)
 
-def put_secret(secret_name, secret_value, region=None, raw=False):
+def put_secret(secret_name, secret_value, region=None, raw=False, binary=False):
     """Save the supplied value as the secret in the AWS Secrets Manager"""
     client = get_aws_client(region)
     if raw:
         secret_string = secret_value
     else:
         secret_string = json.dumps(secret_value)
-    response = client.put_secret_value(
-        SecretId=secret_name,
-        SecretString=secret_string,
-        VersionStages=[
-            'AWSCURRENT'
-        ]
-    )
+
+    args = {
+        'SecretId': secret_name,
+        'VersionStages': ['AWSCURRENT']
+    }
+
+    if binary:
+        args['SecretBinary'] = secret_string
+    else:
+        args['SecretString'] = secret_string
+
+    response = client.put_secret_value(**args)
 
 def get_region():
     """Extrapolate the preferred region when one isn't supplied"""
@@ -170,9 +175,14 @@ def list(secret, category, region):
 @click.argument('secret')
 @click.argument('input', type=click.File('rb'))
 @click.option('-r', '--region', default=None, help='Specify which AWS Region the secret is stored in')
-def upload(secret, input, region):
-    content = input.read().decode("utf-8")
-    put_secret(secret, content, region, raw=True)
+@click.option('--binary/--no-binary', default=False, help='If set the file will be uploaded as a binary')
+def upload(secret, input, region, binary):
+    if binary:
+        content = input.read()
+        put_secret(secret, content, region, raw=True, binary=True)
+    else:
+        content = input.read().decode("utf-8")
+        put_secret(secret, content, region, raw=True)
 
 
 @cli.command(short_help="Download the entire secrets file")
